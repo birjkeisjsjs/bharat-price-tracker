@@ -1,0 +1,143 @@
+'use client';
+import { useState } from 'react';
+import { MapPin, Search, TrendingUp, TrendingDown, ArrowLeft } from 'lucide-react';
+
+export default function BharatPriceTracker() {
+  const [pin, setPin] = useState('');
+  const [location, setLocation] = useState('');
+  const [showResults, setShowResults] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const fetchPrices = () => {
+    if (!pin || pin.length !== 6) {
+      alert("Please enter a valid 6-digit PIN code");
+      return;
+    }
+    setLoading(true);
+    setTimeout(() => {
+      setLocation("Delhi"); // Mock - you can improve later
+      setShowResults(true);
+      setLoading(false);
+    }, 800);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-orange-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 bg-green-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold">₹</div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Bharat Prices</h1>
+              <p className="text-xs text-gray-500 -mt-1">Daily Needs • Real Prices</p>
+            </div>
+          </div>
+          <div className="text-sm text-gray-600 flex items-center gap-1">
+            <MapPin className="w-4 h-4" /> Pan India
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-6 py-10">
+        {!showResults ? (
+          /* ==================== HOME PAGE ==================== */
+          <div className="max-w-2xl mx-auto text-center py-20">
+            <h2 className="text-6xl font-bold text-gray-900 leading-tight mb-6">
+              Know the <span className="text-green-600">Real Price</span><br />Near You
+            </h2>
+            <p className="text-xl text-gray-600 mb-12">Fuel • Vegetables • LPG • Groceries</p>
+
+            <div className="bg-white rounded-3xl shadow-2xl p-3">
+              <div className="flex">
+                <input
+                  type="text"
+                  maxLength={6}
+                  placeholder="Enter PIN Code (e.g. 110001)"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+                  className="flex-1 px-8 py-7 text-2xl outline-none rounded-3xl"
+                />
+                <button
+                  onClick={fetchPrices}
+                  disabled={loading}
+                  className="bg-green-600 hover:bg-green-700 text-white px-12 rounded-3xl font-semibold flex items-center gap-3 text-lg disabled:opacity-70"
+                >
+                  {loading ? "Fetching..." : "Get Prices"} <Search />
+                </button>
+              </div>
+            </div>
+
+            <button className="mt-8 flex items-center gap-2 mx-auto text-green-600 hover:text-green-700 font-medium">
+              <MapPin className="w-5 h-5" /> Use My Current Location
+            </button>
+          </div>
+        ) : (
+          /* ==================== RESULTS DASHBOARD ==================== */
+          <div>
+            <div className="flex items-center justify-between mb-10">
+              <div className="flex items-center gap-4">
+                <button onClick={() => setShowResults(false)} className="p-3 hover:bg-gray-100 rounded-2xl">
+                  <ArrowLeft />
+                </button>
+                <div>
+                  <p className="text-sm text-gray-500">Prices for</p>
+                  <h3 className="text-3xl font-bold flex items-center gap-3">
+                    <MapPin className="text-orange-500" /> {location} - {pin}
+                  </h3>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500">Last updated: Just now</p>
+            </div>
+
+            {/* Fuel Section */}
+            <section className="mb-16">
+              <h3 className="text-3xl font-semibold mb-8 flex items-center gap-3">⛽ Fuel Prices</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { name: "Petrol", price: "94.72", change: -1.2, unit: "₹/Litre" },
+                  { name: "Diesel", price: "87.45", change: 0.3, unit: "₹/Litre" },
+                  { name: "CNG", price: "76.50", change: -0.8, unit: "₹/Kg" },
+                  { name: "LPG (14.2kg)", price: "903", change: 0, unit: "Domestic" },
+                ].map((item) => (
+                  <div key={item.name} className="bg-white rounded-3xl p-8 shadow hover:shadow-xl transition-all">
+                    <p className="text-gray-500 text-lg">{item.name}</p>
+                    <p className="text-5xl font-bold my-4">₹{item.price}</p>
+                    <div className={`flex items-center gap-2 text-lg ${item.change < 0 ? 'text-green-600' : item.change > 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                      {item.change < 0 ? <TrendingDown /> : item.change > 0 ? <TrendingUp /> : null}
+                      {item.change !== 0 && item.change} today
+                    </div>
+                    <p className="text-sm text-gray-400 mt-6">{item.unit}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Vegetables Section (Mock) */}
+            <section>
+              <h3 className="text-3xl font-semibold mb-8">🥬 Vegetable Prices (Mandi)</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {[
+                  { name: "Tomato", price: "28", unit: "₹/kg" },
+                  { name: "Onion", price: "42", unit: "₹/kg" },
+                  { name: "Potato", price: "22", unit: "₹/kg" },
+                  { name: "Brinjal", price: "35", unit: "₹/kg" },
+                ].map((v) => (
+                  <div key={v.name} className="bg-white p-6 rounded-3xl shadow">
+                    <p className="font-medium">{v.name}</p>
+                    <p className="text-4xl font-bold mt-2">₹{v.price}</p>
+                    <p className="text-sm text-gray-500">{v.unit}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        )}
+      </main>
+
+      <footer className="text-center py-10 text-gray-500 text-sm">
+        Data is for demonstration • Sources: PPAC, Agmarknet & others
+      </footer>
+    </div>
+  );
+}
